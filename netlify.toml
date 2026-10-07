@@ -1,0 +1,19 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  node_bundler = "esbuild"
+
+# SPA fallback so /admin serves index.html. API routes are handled
+# by netlify/functions/api.ts, which takes precedence over this rule.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Local development: `npx netlify dev` runs the frontend and the function together.
+[dev]
+  command = "npm run dev"
+  targetPort = 3000
+  port = 8888
