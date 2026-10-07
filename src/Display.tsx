@@ -108,14 +108,9 @@ const Display = () => {
               key={item.id}
               className="rounded-2xl border-l-8 border-sky-400 bg-white/5 px-4 py-4"
             >
-              <h2 className="text-[4vw] leading-tight font-bold">
-                {item.title}
-              </h2>
-              {item.content && (
-                <p className="mt-4 text-[3vw] leading-snug whitespace-pre-line text-white/80">
-                  {item.content}
-                </p>
-              )}
+              <p className="text-[3vw] leading-snug font-medium whitespace-pre-line">
+                {item.content}
+              </p>
             </li>
           ))}
         </ul>

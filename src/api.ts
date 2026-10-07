@@ -1,12 +1,11 @@
 export type News = {
   id: string;
-  title: string;
   content: string;
   visible: boolean;
   createdAt: string;
 };
 
-export type NewsInput = Pick<News, 'title' | 'content' | 'visible'>;
+export type NewsInput = Pick<News, 'content' | 'visible'>;
 
 const PASSWORD_KEY = 'news-bar-password';
 

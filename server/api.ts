@@ -5,7 +5,6 @@ import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
 
 export type News = {
   id: string;
-  title: string;
   content: string;
   visible: boolean;
   createdAt: string;
@@ -43,10 +42,18 @@ async function readBody(req: Request): Promise<Record<string, unknown>> {
 }
 
 function parseNews(body: Record<string, unknown>) {
-  const title = typeof body.title === 'string' ? body.title.trim() : '';
   const content = typeof body.content === 'string' ? body.content.trim() : '';
   const visible = body.visible !== false;
-  return { title, content, visible };
+  return { content, visible };
+}
+
+// News used to have a separate title. Fold it into the content so older
+// entries keep showing everything; the title is dropped on the next save.
+function migrate(news: (News & { title?: string })[]): News[] {
+  return news.map(({ title, ...item }) => ({
+    ...item,
+    content: [title, item.content].filter(Boolean).join('\n'),
+  }));
 }
 
 export async function handleApi(
@@ -57,7 +64,7 @@ export async function handleApi(
   const method = req.method;
 
   if (path === '/api/news' && method === 'GET') {
-    const news = await storage.load();
+    const news = migrate(await storage.load());
     return json(
       200,
       news.filter((n) => n.visible),
@@ -72,7 +79,7 @@ export async function handleApi(
     return json(401, { error: 'Nieprawidłowe hasło' });
   }
 
-  let news = await storage.load();
+  let news = migrate(await storage.load());
 
   if (path === '/api/admin/news' && method === 'GET') {
     return json(200, news);
@@ -80,7 +87,7 @@ export async function handleApi(
 
   if (path === '/api/admin/news' && method === 'POST') {
     const data = parseNews(await readBody(req));
-    if (!data.title) return json(400, { error: 'Tytuł jest wymagany' });
+    if (!data.content) return json(400, { error: 'Treść jest wymagana' });
     const item: News = {
       id: randomUUID(),
       createdAt: new Date().toISOString(),
@@ -110,7 +117,7 @@ export async function handleApi(
 
     if (method === 'PUT') {
       const data = parseNews(await readBody(req));
-      if (!data.title) return json(400, { error: 'Tytuł jest wymagany' });
+      if (!data.content) return json(400, { error: 'Treść jest wymagana' });
       news[index] = { ...news[index], ...data };
       await storage.save(news);
       return json(200, news[index]);

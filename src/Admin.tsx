@@ -8,7 +8,7 @@ import {
   UnauthorizedError,
 } from './api';
 
-const EMPTY: NewsInput = { title: '', content: '', visible: true };
+const EMPTY: NewsInput = { content: '', visible: true };
 
 const Login = ({ onLogin }: { onLogin: () => void }) => {
   const [password, setValue] = useState('');
@@ -73,15 +73,10 @@ const NewsForm = ({
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-3">
-      <input
-        required
-        placeholder="Tytuł"
-        value={data.title}
-        onChange={(e) => setData({ ...data, title: e.target.value })}
-        className="rounded border border-slate-300 px-3 py-2 font-medium"
-      />
       <textarea
-        placeholder="Treść (opcjonalnie)"
+        required
+        autoFocus={!!onCancel}
+        placeholder="Treść newsa"
         rows={3}
         value={data.content}
         onChange={(e) => setData({ ...data, content: e.target.value })}
@@ -188,7 +183,9 @@ const Admin = () => {
     });
 
   const remove = (item: News) => {
-    if (!confirm(`Usunąć „${item.title}”?`)) return;
+    const preview =
+      item.content.length > 60 ? `${item.content.slice(0, 60)}…` : item.content;
+    if (!confirm(`Usunąć „${preview}”?`)) return;
     run(async () => {
       await api.remove(item.id);
       setNews((list) => list.filter((n) => n.id !== item.id));
@@ -280,12 +277,7 @@ const Admin = () => {
                   </button>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold">{item.title}</h3>
-                  {item.content && (
-                    <p className="mt-1 text-sm whitespace-pre-line">
-                      {item.content}
-                    </p>
-                  )}
+                  <p className="whitespace-pre-line">{item.content}</p>
                 </div>
                 <label
                   className="flex shrink-0 items-center gap-1 text-sm text-slate-700"
