@@ -1,8 +1,66 @@
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/nunito';
 @import 'tailwindcss';
+
+/* Autumn palette: warm paper background, bark-brown text, leaf accents. */
+@theme {
+  --color-cream: #fbf3e6;
+  --color-paper: #fffaf2;
+  --color-sand: #ead9c0;
+  --color-bark: #3b2a1e;
+  --color-bark-muted: #7a6250;
+  --color-pumpkin: #d9692a;
+  --color-rust: #a8432a;
+  --color-rust-dark: #8a3520;
+  --color-mustard: #d9a030;
+  --color-olive: #7d8b3a;
+
+  --font-sans: 'Nunito Variable', 'Segoe UI', Arial, sans-serif;
+  --font-serif: 'Fraunces Variable', Georgia, serif;
+}
 
 body {
   margin: 0;
-  color: var(--color-slate-900);
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  background: var(--color-slate-100);
+  color: var(--color-bark);
+  font-family: var(--font-sans);
+  background: var(--color-cream);
+}
+
+/* Falling leaves on the display screen. The outer element falls, the inner one sways. */
+@keyframes leaf-fall {
+  from {
+    transform: translateY(-15vh);
+  }
+  to {
+    transform: translateY(115vh);
+  }
+}
+
+@keyframes leaf-sway {
+  0%,
+  100% {
+    transform: translateX(-3vw) rotate(-25deg);
+  }
+  50% {
+    transform: translateX(3vw) rotate(35deg);
+  }
+}
+
+.leaf {
+  animation: leaf-fall linear infinite;
+}
+
+.leaf > svg {
+  animation: leaf-sway ease-in-out infinite;
+}
+
+/* No motion: leaves rest in scattered spots instead of falling. */
+@media (prefers-reduced-motion: reduce) {
+  .leaf {
+    top: var(--rest-top);
+  }
+  .leaf,
+  .leaf > svg {
+    animation: none;
+  }
 }

@@ -1,9 +1,18 @@
 import { type RefObject, useEffect, useRef, useState } from 'react';
 import { api, type News } from './api';
+import { FallingLeaves, Leaf } from './Leaves';
 
 const REFRESH_MS = 60_000;
 const SCROLL_PX_PER_SEC = 40;
 const PAUSE_MS = 5_000;
+
+// Card stripe colors cycle through the autumn palette.
+const ACCENTS = [
+  'border-pumpkin',
+  'border-mustard',
+  'border-rust',
+  'border-olive',
+];
 
 function useNow() {
   const [now, setNow] = useState(() => new Date());
@@ -75,17 +84,22 @@ const Display = () => {
   useAutoScroll(listRef);
 
   return (
-    <div className="flex h-screen flex-col bg-linear-to-b from-slate-950 to-slate-900 text-white">
-      <header className="flex items-end justify-between border-b border-white/10 px-6 py-4">
-        <h1 className="text-[4vw] leading-none font-bold">Aktualności</h1>
+    <div className="relative flex h-screen flex-col bg-linear-to-b from-cream to-[#f5e3c8] text-bark">
+      <FallingLeaves />
+
+      <header className="relative z-10 flex items-end justify-between px-6 pt-4 pb-3">
+        <h1 className="flex items-center gap-[1vw] font-serif text-[4vw] leading-none font-semibold">
+          <Leaf className="h-[3.4vw] w-[3.4vw] text-pumpkin" />
+          Aktualności
+        </h1>
         <div className="text-right">
-          <div className="text-[4vw] leading-none font-bold tabular-nums">
+          <div className="font-serif text-[4vw] leading-none font-semibold text-rust tabular-nums">
             {now.toLocaleTimeString('pl-PL', {
               hour: '2-digit',
               minute: '2-digit',
             })}
           </div>
-          <div className="mt-2 text-[1.6vw] text-white/60 capitalize">
+          <div className="mt-2 text-[1.6vw] text-bark-muted capitalize">
             {now.toLocaleDateString('pl-PL', {
               weekday: 'long',
               day: 'numeric',
@@ -95,20 +109,24 @@ const Display = () => {
           </div>
         </div>
       </header>
+      <div className="relative z-10 mx-6 h-1.5 rounded-full bg-linear-to-r from-mustard via-pumpkin to-rust" />
 
-      <div ref={listRef} className="flex-1 overflow-hidden px-6 py-4">
+      <div
+        ref={listRef}
+        className="relative z-10 flex-1 overflow-hidden px-6 py-4"
+      >
         {news?.length === 0 && (
-          <p className="mt-[20vh] text-center text-[2.5vw] text-white/40">
+          <p className="mt-[20vh] text-center font-serif text-[2.5vw] text-bark-muted">
             Brak aktualności
           </p>
         )}
         <ul className="flex flex-col gap-4">
-          {news?.map((item) => (
+          {news?.map((item, index) => (
             <li
               key={item.id}
-              className="rounded-2xl border-l-8 border-sky-400 bg-white/5 px-4 py-4"
+              className={`rounded-2xl border-l-8 bg-paper/90 px-4 py-4 shadow-[0_4px_16px_-6px_rgb(120_70_30/0.25)] ${ACCENTS[index % ACCENTS.length]}`}
             >
-              <p className="text-[3vw] leading-snug font-medium whitespace-pre-line">
+              <p className="text-[3vw] leading-snug font-semibold whitespace-pre-line">
                 {item.content}
               </p>
             </li>
