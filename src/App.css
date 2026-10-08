@@ -66,8 +66,6 @@ body {
 }
 
 
-.netlify-identity-button,
-[id*="netlify"],
-.netlify-badge {
+.nl-badge{
     display: none !important;
 }
